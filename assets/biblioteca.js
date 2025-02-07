@@ -1,94 +1,130 @@
 class Libro {
-    _titulo          = '';
-    _autor           = '';
-    _anioPublicacion = '';
-    _disponible      = true;
-
-    constructor(_titulo = 'Sin nombre', _autor = 'Sin autor', _anioPublicacion = '0000', _disponible = true) {
-        this._titulo          = _titulo;
-        this._autor           = _autor;
-        this._anioPublicacion = _anioPublicacion;
-        this. _disponible     = _disponible;
+    constructor(titulo, autor, anioPublicacion) {
+        this.titulo = titulo;
+        this.autor = autor;
+        this.anioPublicacion = anioPublicacion;
+        this.disponible = true;
     }
 
     info() {
-        console.log(`El titulo del libro es: ${this._titulo}, 
-                    su autor: ${this._autor}, 
-                    el año de publicación: ${this._anioPublicacion}, disponibilidad: ${this._disponible}.`);
+        console.log(`Título: ${this.titulo}, Autor: ${this.autor}, Año: ${this.anioPublicacion}, Disponible: ${this.disponible ? 'Sí' : 'No'}`);
     }
 
     prestar() {
-        return this._disponible = false;
+        if (this.disponible) {
+            this.disponible = false;
+            console.log(`El libro "${this.titulo}" ha sido prestado.`);
+        } else {
+            console.log(`El libro "${this.titulo}" no está disponible.`);
+        }
     }
 
     devolver() {
-        return this._disponible = true;
+        this.disponible = true;
+        console.log(`El libro "${this.titulo}" ha sido devuelto.`);
     }
 }
 
 class Usuario {
-    _nombre          = '';
-    _idUsuario       = '';
-    _librosPrestados = [];
-
-    constructor(_nombre = 'Sin nombre', _idUsuario = '0', _librosPrestados = []) {
-        this._nombre          = _nombre;
-        this._idUsuario       = _idUsuario;
-        this._librosPrestados = _librosPrestados;
+    constructor(nombre, idUsuario) {
+        this.nombre = nombre;
+        this.idUsuario = idUsuario;
+        this.librosPrestados = [];
     }
 
-    tomarPrestado() {
-        
+    tomarPrestado(libro) {
+        if (this.librosPrestados.length < 3) {
+            if (libro.disponible) {
+                libro.prestar();
+                this.librosPrestados.push(libro);
+                console.log(`${this.nombre} ha tomado prestado "${libro.titulo}".`);
+            } else {
+                console.log(`${this.nombre}, el libro "${libro.titulo}" no está disponible.`);
+            }
+        } else {
+            console.log(`${this.nombre} ya tiene 3 libros prestados, no puede tomar más.`);
+        }
     }
 
-    devolverLibro() {}
+    devolverLibro(libro) {
+        const index = this.librosPrestados.indexOf(libro);
+        if (index !== -1) {
+            libro.devolver();
+            this.librosPrestados.splice(index, 1);
+            console.log(`${this.nombre} ha devuelto "${libro.titulo}".`);
+        } else {
+            console.log(`${this.nombre} no tiene el libro "${libro.titulo}".`);
+        }
+    }
 
-    mostrarLibrosPrestados() {}
+    mostrarLibrosPrestados() {
+        console.log(`${this.nombre} tiene prestados:`);
+        this.librosPrestados.forEach(libro => libro.info());
+    }
 }
 
 class Biblioteca {
-    constructor() {
-        this._nombreBiblioteca = '';
-        this._libros           = [];
-        this._usuarios         = [];
+    constructor(nombre) {
+        this.nombre = nombre;
+        this.libros = [];
+        this.usuarios = [];
     }
 
-    agregarLibro() {
-        for(let i = 0; i < 2; i++){
-            const titulo          = prompt('Ingrese el nombre del nuevo libro:');
-            const autor           = prompt('Ingrese el autor del libro:');
-            const anioPublicacion = prompt('Ingrese el año de publicación del libro:');
-            const disponible      = true;
-
-            const libro = new Libro(titulo, autor, anioPublicacion, disponible);
-
-           this._libros.push(libro);
-        }
-        console.log(this._libros);
+    agregarLibro(libro) {
+        this.libros.push(libro);
+        console.log(`Se agregó el libro "${libro.titulo}" a la biblioteca.`);
     }
 
-    registrarUsuario() {
-        let idUsuario         = 0;
-
-        for(let i = 0; i < 2; i++){
-            const nombre          = prompt('Ingrese el nombre del usuario:');
-            const librosPrestados = ['0 Libros prestados'];
-
-            idUsuario++;
-
-            const usuario = new Usuario(nombre, idUsuario, librosPrestados);
-
-           this._usuarios.push(usuario);
-        }
-        console.log(this._usuarios);
+    registrarUsuario(usuario) {
+        this.usuarios.push(usuario);
+        console.log(`Se registró el usuario "${usuario.nombre}".`);
     }
 
     mostrarLibrosDisponibles() {
-        console.log(`Los libros disponibles son: ${JSON.stringify(this._libros)}`);
+        console.log(`Libros disponibles en la biblioteca "${this.nombre}":`);
+        this.libros.filter(libro => libro.disponible).forEach(libro => libro.info());
+    }
+
+    buscarLibro(termino) {
+        const resultados = this.libros.filter(libro =>
+            libro.titulo.toLowerCase().includes(termino.toLowerCase()) ||
+            libro.autor.toLowerCase().includes(termino.toLowerCase())
+        );
+
+        if (resultados.length > 0) {
+            console.log(`🔍 Resultados de la búsqueda para "${termino}":`);
+            resultados.forEach(libro => libro.info());
+        } else {
+            console.log(`No se encontraron libros con "${termino}".`);
+        }
     }
 }
 
-const biblioteca = new Biblioteca();
-biblioteca.agregarLibro();
+// Prueba del sistema
+
+const biblioteca = new Biblioteca("Biblioteca Central");
+
+const libro1 = new Libro("El principito", "Antoine de Saint-Exupéry", 1943);
+const libro2 = new Libro("1984", "George Orwell", 1949);
+const libro3 = new Libro("Cien años de soledad", "Gabriel García Márquez", 1967);
+
+biblioteca.agregarLibro(libro1);
+biblioteca.agregarLibro(libro2);
+biblioteca.agregarLibro(libro3);
+
+const usuario1 = new Usuario("Carlos", 1);
+const usuario2 = new Usuario("María", 2);
+
+biblioteca.registrarUsuario(usuario1);
+biblioteca.registrarUsuario(usuario2);
+
 biblioteca.mostrarLibrosDisponibles();
-biblioteca.registrarUsuario();
+
+usuario1.tomarPrestado(libro1);
+usuario1.tomarPrestado(libro2);
+usuario1.mostrarLibrosPrestados();
+
+usuario1.devolverLibro(libro1);
+biblioteca.mostrarLibrosDisponibles();
+
+biblioteca.buscarLibro("orwell");
