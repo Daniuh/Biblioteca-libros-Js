@@ -35,11 +35,11 @@ class Usuario {
         this._nombre          = _nombre;
         this._idUsuario       = _idUsuario;
         this._librosPrestados = _librosPrestados;
-
-        this.libro = new Libro();
     }
 
-    tomarPrestado() {}
+    tomarPrestado() {
+        
+    }
 
     devolverLibro() {}
 
@@ -67,7 +67,21 @@ class Biblioteca {
         console.log(this._libros);
     }
 
-    registrarUsuario() {}
+    registrarUsuario() {
+        let idUsuario         = 0;
+
+        for(let i = 0; i < 2; i++){
+            const nombre          = prompt('Ingrese el nombre del usuario:');
+            const librosPrestados = ['0 Libros prestados'];
+
+            idUsuario++;
+
+            const usuario = new Usuario(nombre, idUsuario, librosPrestados);
+
+           this._usuarios.push(usuario);
+        }
+        console.log(this._usuarios);
+    }
 
     mostrarLibrosDisponibles() {
         console.log(`Los libros disponibles son: ${JSON.stringify(this._libros)}`);
@@ -77,3 +91,4 @@ class Biblioteca {
 const biblioteca = new Biblioteca();
 biblioteca.agregarLibro();
 biblioteca.mostrarLibrosDisponibles();
+biblioteca.registrarUsuario();
